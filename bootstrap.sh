@@ -5,7 +5,8 @@ export TF_VAR_client_secret=$(/usr/bin/security find-generic-password -w -a "joh
 
 cd terraform
 
-tfenv use 0.15.3
+tfenv install 1.1.7
+tfenv use 1.1.7
 
 terraform fmt
 terraform init
