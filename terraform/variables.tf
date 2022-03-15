@@ -26,5 +26,5 @@ variable "resource_group_name" {
 }
 
 variable "location" {
-  default = "Central US"
+  default = "East US"
 }
