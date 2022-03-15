@@ -14,6 +14,10 @@ terraform {
       source  = "azurerm"
       version = "~>2.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = ">= 4.5.2"
+    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0.2"
@@ -22,8 +26,31 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.10.0"
     }
-
+    flux = {
+      source  = "fluxcd/flux"
+      version = ">= 0.0.13"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">=3.1.0"
+    }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = ">=3.10.0"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = ">=2.1.0"
+    }
+    sops = {
+      source  = "carlpett/sops"
+      version = ">=0.6.3"
+    }
   }
+}
+
+data "sops_file" "cloudflare_secrets" {
+  source_file = "secret.sops.yaml"
 }
 
 provider "azurerm" {
@@ -31,6 +58,13 @@ provider "azurerm" {
   # If you're using version 1.x, the "features" block is not allowed.
   features {}
 }
+
+provider "cloudflare" {
+  email   = data.sops_file.cloudflare_secrets.data["cloudflare_email"]
+  api_key = data.sops_file.cloudflare_secrets.data["cloudflare_apikey"]
+}
+
+provider "flux" {}
 
 provider "kubectl" {}
 
@@ -40,4 +74,8 @@ provider "kubernetes" {
   client_certificate     = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
   client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
+}
+provider "github" {
+  owner = data.sops_file.cloudflare_secrets.data["github_owner"]
+  token = data.sops_file.cloudflare_secrets.data["github_token"]
 }
