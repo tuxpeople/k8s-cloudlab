@@ -32,11 +32,7 @@ variable "location" {
 variable "github_owner" {
   type        = string
   description = "github owner"
-}
-
-variable "github_token" {
-  type        = string
-  description = "github token"
+  default     = "tuxpeople"
 }
 
 variable "repository_name" {

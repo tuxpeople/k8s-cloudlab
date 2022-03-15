@@ -66,7 +66,15 @@ provider "cloudflare" {
 
 provider "flux" {}
 
-provider "kubectl" {}
+provider "kubectl" {
+  host = azurerm_kubernetes_cluster.k8s.kube_config.0.host
+
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
+
+}
 
 provider "kubernetes" {
   host = azurerm_kubernetes_cluster.k8s.kube_config.0.host
@@ -76,6 +84,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
 }
 provider "github" {
-  owner = data.sops_file.cloudflare_secrets.data["github_owner"]
+  owner = var.github_owner
   token = data.sops_file.cloudflare_secrets.data["github_token"]
 }
