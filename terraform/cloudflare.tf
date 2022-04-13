@@ -5,11 +5,20 @@ data "cloudflare_zones" "domain" {
   }
 }
 
-resource "cloudflare_record" "ipv4" {
-  name    = "azure"
+resource "cloudflare_record" "api" {
+  name    = "azure-api"
   zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
   value   = azurerm_kubernetes_cluster.k8s.fqdn
   proxied = true
   type    = "CNAME"
+  ttl     = 1
+}
+
+resource "cloudflare_record" "ingress" {
+  name    = "azure-ingress"
+  zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
+  value   = azurerm_public_ip.aks_lb_ingress.ip_address
+  proxied = true
+  type    = "A"
   ttl     = 1
 }

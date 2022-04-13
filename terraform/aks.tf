@@ -3,6 +3,14 @@ resource "azurerm_resource_group" "k8s" {
   location = var.location
 }
 
+resource "azurerm_public_ip" "aks_lb_ingress" {
+  name                = "pip-${var.cluster_name}-aks-lb-ingress"
+  location            = azurerm_resource_group.k8s.location
+  resource_group_name = azurerm_resource_group.k8s.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
 resource "azurerm_kubernetes_cluster" "k8s" {
   name                = var.cluster_name
   location            = azurerm_resource_group.k8s.location
@@ -25,6 +33,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     enable_auto_scaling = true
     min_count           = var.agent_min_count
     max_count           = var.agent_max_count
+    vnet_subnet_id      = azurerm_subnet.private.id
   }
 
   service_principal {

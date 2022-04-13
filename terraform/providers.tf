@@ -14,37 +14,21 @@ terraform {
       source  = "azurerm"
       version = "~>2.0"
     }
-    github = {
-      source  = "integrations/github"
-      version = ">= 4.5.2"
-    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0.2"
-    }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.10.0"
-    }
-    flux = {
-      source  = "fluxcd/flux"
-      version = ">= 0.0.13"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = ">=3.1.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
       version = ">=3.10.0"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = ">=2.1.0"
-    }
     sops = {
       source  = "carlpett/sops"
       version = ">=0.6.3"
+    }
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "0.8.0"
     }
   }
 }
@@ -64,18 +48,6 @@ provider "cloudflare" {
   api_key = data.sops_file.cloudflare_secrets.data["cloudflare_apikey"]
 }
 
-provider "flux" {}
-
-provider "kubectl" {
-  host = azurerm_kubernetes_cluster.k8s.kube_config.0.host
-
-  client_certificate     = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
-  client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
-  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
-  load_config_file       = false
-
-}
-
 provider "kubernetes" {
   host = azurerm_kubernetes_cluster.k8s.kube_config.0.host
 
@@ -83,7 +55,7 @@ provider "kubernetes" {
   client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
 }
-provider "github" {
-  owner = var.github_owner
-  token = data.sops_file.cloudflare_secrets.data["github_token"]
+
+provider "kustomization" {
+  kubeconfig_raw = azurerm_kubernetes_cluster.k8s.kube_config_raw
 }

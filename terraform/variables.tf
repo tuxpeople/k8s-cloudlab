@@ -29,32 +29,13 @@ variable "location" {
   default = "East US"
 }
 
-variable "github_owner" {
-  type        = string
-  description = "github owner"
-  default     = "tuxpeople"
-}
-
-variable "repository_name" {
-  type        = string
-  default     = "k8s-cloudlab"
-  description = "github repository name"
-}
-
-variable "repository_visibility" {
-  type        = string
-  default     = "public"
-  description = "How visible is the github repo"
-}
-
-variable "branch" {
-  type        = string
-  default     = "master"
-  description = "branch name"
-}
-
-variable "target_path" {
-  type        = string
-  default     = "cluster/base"
-  description = "flux sync target path"
+variable "network_cidrs" {
+  default = {
+    vnet   = "10.0.0.0/8"
+    subnet = "10.1.0.0/16"
+  }
+  type = object({
+    vnet   = string
+    subnet = string
+  })
 }
