@@ -38,7 +38,7 @@ metadata:
   name: hello-kubernetes
 spec:
   rules:
-  - host: k8stest.eighty-three.me
+  - host: azure.eighty-three.me
     http:
       paths:
       - path: /test
