@@ -44,7 +44,7 @@ spec:
   - host: azure-ingress.eighty-three.me
     http:
       paths:
-      - path: /test
+      - path: /
         pathType: Prefix
         backend:
           service:
