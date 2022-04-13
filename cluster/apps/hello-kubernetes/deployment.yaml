@@ -36,6 +36,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-kubernetes
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
   rules:
   - host: azure-ingress.eighty-three.me
