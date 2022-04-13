@@ -22,3 +22,12 @@ resource "cloudflare_record" "ingress" {
   type    = "A"
   ttl     = 1
 }
+
+resource "cloudflare_record" "test" {
+  name    = "azure-test"
+  zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
+  value   = azurerm_public_ip.aks_lb_ingress.ip_address
+  proxied = true
+  type    = "A"
+  ttl     = 1
+}
