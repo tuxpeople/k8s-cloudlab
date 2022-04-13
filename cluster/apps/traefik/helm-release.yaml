@@ -41,6 +41,9 @@ spec:
       spec:
         loadBalancerIP: "${loadBalancerIP}"
         externalTrafficPolicy: Local
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: ${resource_group_name}
+        service.beta.kubernetes.io/azure-load-balancer-internal: "false"
     logs:
       general:
         format: json
