@@ -1,10 +1,10 @@
 resource "azurerm_resource_group" "k8s" {
-  name     = var.resource_group_name
+  name     = "rg-${local.infix}-aks"
   location = var.location
 }
 
 resource "azurerm_public_ip" "aks_lb_ingress" {
-  name                = "pip-${var.cluster_name}-aks-lb-ingress"
+  name                = "pip-${local.infix}-aks-lb-ingress"
   location            = azurerm_resource_group.k8s.location
   resource_group_name = azurerm_resource_group.k8s.name
   allocation_method   = "Static"
@@ -12,10 +12,10 @@ resource "azurerm_public_ip" "aks_lb_ingress" {
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
-  name                = var.cluster_name
+  name                = "aks-${local.infix}"
   location            = azurerm_resource_group.k8s.location
   resource_group_name = azurerm_resource_group.k8s.name
-  dns_prefix          = var.dns_prefix
+  dns_prefix          = local.infix
   kubernetes_version  = var.aks.kubernetes_version
 
   linux_profile {
@@ -50,4 +50,9 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   tags = {
     Environment = "Cloudlab"
   }
+}
+
+resource "local_file" "kube_config" {
+  content  = azurerm_kubernetes_cluster.k8s.kube_config_raw
+  filename = "~/iCloudDrive/Allgemein/kubectl/${local.infix}.yaml"
 }

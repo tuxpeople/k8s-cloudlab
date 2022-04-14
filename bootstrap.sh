@@ -2,6 +2,7 @@
 
 export TF_VAR_client_id=$(/usr/bin/security find-generic-password -w -a "johnnyappleseed" -l "aks-client-id")
 export TF_VAR_client_secret=$(/usr/bin/security find-generic-password -w -a "johnnyappleseed" -l "aks-client-secret")
+export TF_VAR_environment="prod"
 
 _pwd=$(pwd)
 
@@ -10,11 +11,10 @@ tfenv use 1.1.7
 
 cd terraform/
 rm -rf .terraform
-terraform init -backend-config=config/backend.tfvars -upgrade=true
+terraform init -backend-config=config/${TF_VAR_environment}_backend.tfvars -upgrade=true
 terraform fmt -recursive
 terraform validate
-terraform plan -out=out.plan -var-file=config/infrastructure.tfvars 
-rm -f out.plan; exit 0
+terraform plan -out=out.plan -var-file=config/${TF_VAR_environment}.tfvars 
 terraform apply -parallelism=128 -auto-approve out.plan 
 rm -f out.plan
 

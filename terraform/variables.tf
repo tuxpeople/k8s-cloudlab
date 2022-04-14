@@ -1,10 +1,13 @@
+locals {
+  infix = "${var.purpose}-${var.environment}"
+}
+
 variable "client_id" {}
 variable "client_secret" {}
 variable "location" {}
 variable "ssh_public_key" {}
-variable "dns_prefix" {}
-variable "cluster_name" {}
-variable "resource_group_name" {}
+variable "purpose" {}
+variable "environment" {}
 variable "network_cidrs" {
   type = object({
     vnet   = string

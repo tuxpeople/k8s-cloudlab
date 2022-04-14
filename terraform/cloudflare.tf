@@ -6,7 +6,7 @@ data "cloudflare_zones" "domain" {
 }
 
 resource "cloudflare_record" "api" {
-  name    = "azure-api"
+  name    = "${local.infix}-api"
   zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
   value   = azurerm_kubernetes_cluster.k8s.fqdn
   proxied = true
@@ -15,7 +15,7 @@ resource "cloudflare_record" "api" {
 }
 
 resource "cloudflare_record" "ingress" {
-  name    = "azure-ingress"
+  name    = "${local.infix}-ingress"
   zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
   value   = azurerm_public_ip.aks_lb_ingress.ip_address
   proxied = true
@@ -24,7 +24,7 @@ resource "cloudflare_record" "ingress" {
 }
 
 resource "cloudflare_record" "test" {
-  name    = "azure-test"
+  name    = "${local.infix}-test"
   zone_id = lookup(data.cloudflare_zones.domain.zones[0], "id")
   value   = azurerm_public_ip.aks_lb_ingress.ip_address
   proxied = true
