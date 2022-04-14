@@ -54,5 +54,5 @@ resource "azurerm_kubernetes_cluster" "k8s" {
 
 resource "local_file" "kube_config" {
   content  = azurerm_kubernetes_cluster.k8s.kube_config_raw
-  filename = "~/iCloudDrive/Allgemein/kubectl/${local.infix}.yaml"
+  filename = "output/kubectl/${local.infix}.yaml"
 }
