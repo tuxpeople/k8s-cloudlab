@@ -2,17 +2,16 @@ terraform {
 
   required_version = "~> 1.0"
 
-  backend "azurerm" {
-    resource_group_name  = "tstate-rg"
-    storage_account_name = "tfstate11747"
-    container_name       = "tfstate"
-    key                  = "aks-test.tfstate"
-  }
+  backend "azurerm" {}
 
   required_providers {
     azurerm = {
       source  = "azurerm"
       version = "~>2.0"
+    }
+    sops = {
+      source  = "carlpett/sops"
+      version = ">=0.6.3"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -22,19 +21,27 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = ">=3.10.0"
     }
-    sops = {
-      source  = "carlpett/sops"
-      version = ">=0.6.3"
+    github = {
+      source  = "integrations/github"
+      version = ">= 4.5.2"
     }
-    kustomization = {
-      source  = "kbst/kustomization"
-      version = "0.8.0"
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.10.0"
+    }
+    flux = {
+      source  = "fluxcd/flux"
+      version = ">= 0.0.13"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "3.1.0"
     }
   }
 }
 
-data "sops_file" "cloudflare_secrets" {
-  source_file = "secret.sops.yaml"
+data "sops_file" "sops_secrets" {
+  source_file = "config/secret.sops.yaml"
 }
 
 provider "azurerm" {
@@ -44,18 +51,26 @@ provider "azurerm" {
 }
 
 provider "cloudflare" {
-  email   = data.sops_file.cloudflare_secrets.data["cloudflare_email"]
-  api_key = data.sops_file.cloudflare_secrets.data["cloudflare_apikey"]
+  email   = data.sops_file.sops_secrets.data["cloudflare_email"]
+  api_key = data.sops_file.sops_secrets.data["cloudflare_apikey"]
 }
 
 provider "kubernetes" {
-  host = azurerm_kubernetes_cluster.k8s.kube_config.0.host
-
+  host                   = azurerm_kubernetes_cluster.k8s.kube_config.0.host
   client_certificate     = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
   client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
 }
 
-provider "kustomization" {
-  kubeconfig_raw = azurerm_kubernetes_cluster.k8s.kube_config_raw
+provider "github" {
+  owner = var.github_owner
+  token = data.sops_file.sops_secrets.data["github_token"]
+}
+
+provider "kubectl" {
+  host                   = azurerm_kubernetes_cluster.k8s.kube_config.0.host
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
 }

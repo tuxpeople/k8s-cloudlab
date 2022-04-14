@@ -1,7 +1,7 @@
 
 data "cloudflare_zones" "domain" {
   filter {
-    name = data.sops_file.cloudflare_secrets.data["cloudflare_domain"]
+    name = data.sops_file.sops_secrets.data["cloudflare_domain"]
   }
 }
 

@@ -16,8 +16,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   location            = azurerm_resource_group.k8s.location
   resource_group_name = azurerm_resource_group.k8s.name
   dns_prefix          = var.dns_prefix
-  // az aks get-versions --location eastus -o table
-  kubernetes_version = "1.22.6"
+  kubernetes_version  = var.aks.kubernetes_version
 
   linux_profile {
     admin_username = "ubuntu"
@@ -28,13 +27,13 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 
   default_node_pool {
-    name                = "agentpool"
-    vm_size             = "Standard_B2s"
+    name                = "linux"
+    vm_size             = var.aks.node_pool.vm_size
     type                = "VirtualMachineScaleSets"
-    availability_zones  = ["1", "2", "3"]
+    availability_zones  = var.aks.availability_zones
     enable_auto_scaling = true
-    min_count           = var.agent_min_count
-    max_count           = var.agent_max_count
+    min_count           = var.aks.node_pool.agent_min_count
+    max_count           = var.aks.node_pool.agent_max_count
     vnet_subnet_id      = azurerm_subnet.private.id
   }
 
