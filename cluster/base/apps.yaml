@@ -16,3 +16,4 @@ spec:
     substituteFrom:
       - kind: Secret
         name: aks-secrets
+        namespace: kube-system

@@ -1,7 +1,17 @@
+# Flux
+data "kustomization_build" "flux_system" {
+  path = "../${var.target_path}/flux-system"
+}
+
+resource "kustomization_resource" "flux_system" {
+  for_each = data.kustomization_build.flux_system.ids
+  manifest = data.kustomization_build.flux_system.manifests[each.value]
+}
+
 resource "kubernetes_secret" "aks-secrets" {
   metadata {
     name      = "aks-secrets"
-    namespace = "flux-system"
+    namespace = "kube-system"
   }
 
   data = {
@@ -14,14 +24,4 @@ resource "kubernetes_secret" "aks-secrets" {
       metadata[0].labels,
     ]
   }
-}
-
-# Flux
-data "kustomization_build" "flux_system" {
-  path = "../${var.target_path}/flux-system"
-}
-
-resource "kustomization_resource" "flux_system" {
-  for_each = data.kustomization_build.flux_system.ids
-  manifest = data.kustomization_build.flux_system.manifests[each.value]
 }
